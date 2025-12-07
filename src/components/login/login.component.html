@@ -1,0 +1,64 @@
+
+<div>
+  <h2 class="text-2xl font-bold text-center text-gray-800">Welcome Back!</h2>
+  <p class="text-center text-gray-500 mt-2 mb-6">Sign in to your account</p>
+
+  <div class="bg-gray-100 p-1 rounded-full flex mb-6">
+    <button
+      (click)="setRole('user')"
+      [class]="role() === 'user' ? 'bg-white text-blue-600 shadow' : 'text-gray-500'"
+      class="w-1/2 py-2 rounded-full font-semibold transition-colors duration-300 focus:outline-none">
+      User
+    </button>
+    <button
+      (click)="setRole('operator')"
+      [class]="role() === 'operator' ? 'bg-white text-blue-600 shadow' : 'text-gray-500'"
+      class="w-1/2 py-2 rounded-full font-semibold transition-colors duration-300 focus:outline-none">
+      Operator
+    </button>
+  </div>
+
+  <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+    <div class="space-y-4">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-600">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          required
+          class="mt-1 block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          placeholder="you@example.com">
+      </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          required
+          class="mt-1 block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          placeholder="••••••••">
+      </div>
+    </div>
+    <div class="mt-6">
+      <button 
+        type="submit"
+        [disabled]="loginForm.invalid"
+        class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+        Sign In
+      </button>
+    </div>
+  </form>
+
+  <p class="text-center text-gray-500 mt-6 text-sm">
+    Don't have an account? 
+    <a routerLink="/auth/signup" class="font-medium text-blue-600 hover:text-blue-500">
+      Sign up
+    </a>
+  </p>
+</div>

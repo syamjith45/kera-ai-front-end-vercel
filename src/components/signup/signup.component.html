@@ -1,0 +1,110 @@
+
+<div>
+  <h2 class="text-2xl font-bold text-center text-gray-800">Create Account</h2>
+  <p class="text-center text-gray-500 mt-2 mb-6">Get started with KeraAI Parking</p>
+
+  <div class="bg-gray-100 p-1 rounded-full flex mb-6">
+    <button
+      (click)="setRole('user')"
+      [class]="role() === 'user' ? 'bg-white text-blue-600 shadow' : 'text-gray-500'"
+      class="w-1/2 py-2 rounded-full font-semibold transition-colors duration-300 focus:outline-none">
+      User
+    </button>
+    <button
+      (click)="setRole('operator')"
+      [class]="role() === 'operator' ? 'bg-white text-blue-600 shadow' : 'text-gray-500'"
+      class="w-1/2 py-2 rounded-full font-semibold transition-colors duration-300 focus:outline-none">
+      Operator
+    </button>
+  </div>
+
+  <form (ngSubmit)="onSignup()" #signupForm="ngForm">
+    <div class="space-y-4">
+      <div>
+        <label for="fullName" class="block text-sm font-medium text-gray-600">Full Name</label>
+        <input 
+          type="text" 
+          id="fullName" 
+          name="fullName"
+          [ngModel]="fullName()"
+          (ngModelChange)="fullName.set($event)"
+          required
+          class="mt-1 block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Alex Johnson">
+      </div>
+
+      @if (role() === 'user') {
+        <div>
+          <label for="vehiclePlate" class="block text-sm font-medium text-gray-600">Vehicle Plate</label>
+          <input 
+            type="text" 
+            id="vehiclePlate" 
+            name="vehiclePlate"
+            [ngModel]="vehiclePlate()"
+            (ngModelChange)="vehiclePlate.set($event)"
+            required
+            class="mt-1 block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            placeholder="ABC-1234">
+        </div>
+      }
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-600">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          required
+          class="mt-1 block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          placeholder="you@example.com">
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+          required
+          minlength="6"
+          class="mt-1 block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          placeholder="••••••••">
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-600">Confirm Password</label>
+        <input 
+          type="password" 
+          id="confirmPassword" 
+          name="confirmPassword"
+          [ngModel]="confirmPassword()"
+          (ngModelChange)="confirmPassword.set($event)"
+          required
+          class="mt-1 block w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+          placeholder="••••••••">
+        @if (signupForm.controls['confirmPassword']?.dirty && !passwordsMatch()) {
+          <p class="text-xs text-red-500 mt-1">Passwords do not match.</p>
+        }
+      </div>
+    </div>
+    <div class="mt-6">
+      <button 
+        type="submit"
+        [disabled]="signupForm.invalid || !passwordsMatch()"
+        class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+        Sign Up
+      </button>
+    </div>
+  </form>
+
+  <p class="text-center text-gray-500 mt-6 text-sm">
+    Already have an account? 
+    <a routerLink="/auth/login" class="font-medium text-blue-600 hover:text-blue-500">
+      Sign in
+    </a>
+  </p>
+</div>
