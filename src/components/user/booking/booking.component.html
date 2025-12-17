@@ -1,0 +1,51 @@
+<div class="p-4 space-y-6">
+    <div class="flex items-center gap-4">
+        <button onclick="history.back()" class="p-2 rounded-full hover:bg-gray-100">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                stroke="currentColor" class="w-6 h-6 text-gray-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
+        </button>
+        <h1 class="text-xl font-bold text-gray-800">Book Parking</h1>
+    </div>
+
+    @if (lot(); as parkingLot) {
+    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+        <h2 class="text-lg font-bold text-gray-800">{{ parkingLot.name }}</h2>
+        <p class="text-gray-500 text-sm">{{ parkingLot.address }}</p>
+        <div class="flex justify-between items-center mt-4">
+            <span class="text-blue-600 font-semibold">${{ parkingLot.pricePerHour }}/hr</span>
+            <span class="text-green-600 text-sm font-medium">{{ parkingLot.availableSlots }} spots left</span>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">Start Time</label>
+            <input type="datetime-local" [ngModel]="startTime()"
+                (ngModelChange)="startTime.set($event); calculateCost()"
+                class="w-full p-3 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-gray-600 mb-1">End Time</label>
+            <input type="datetime-local" [ngModel]="endTime()" (ngModelChange)="endTime.set($event); calculateCost()"
+                class="w-full p-3 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none focus:border-blue-500">
+        </div>
+    </div>
+
+    <div class="bg-gray-50 p-4 rounded-xl flex justify-between items-center">
+        <span class="font-semibold text-gray-600">Total Cost</span>
+        <span class="text-2xl font-bold text-blue-600">${{ totalCost() }}</span>
+    </div>
+
+    <button (click)="proceedToPayment()" [disabled]="totalCost() <= 0"
+        class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        Proceed to Payment
+    </button>
+    } @else {
+    <div class="flex justify-center p-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+    }
+</div>

@@ -1,7 +1,8 @@
-
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MapComponent, MapLocation } from '../../map/map.component';
+import { ParkingService } from '../../../services/parking.service';
 
 @Component({
   selector: 'app-user-home',
@@ -9,17 +10,39 @@ import { MapComponent, MapLocation } from '../../map/map.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, MapComponent]
 })
-export class UserHomeComponent {
+export class UserHomeComponent implements OnInit {
+  private parkingService = inject(ParkingService);
+  private router = inject(Router);
   viewMode = signal<'map' | 'list'>('map');
+  parkingGarages = signal<(MapLocation & { id: string; distance: string; available: number; price: number; })[]>([]);
 
-  parkingGarages: (MapLocation & { distance: string; available: number; price: number; })[] = [
-    { name: 'Central Plaza Garage', distance: '0.2 mi', available: 15, price: 5, lat: 40.7155, lng: -74.0042, type: 'parking' },
-    { name: 'Downtown Parking Lot', distance: '0.4 mi', available: 8, price: 6, lat: 40.7101, lng: -74.0051, type: 'parking' },
-    { name: 'Uptown Structure', distance: '0.5 mi', available: 25, price: 4, lat: 40.7182, lng: -74.0088, type: 'parking' },
-    { name: 'City Center Parkade', distance: '0.8 mi', available: 12, price: 5, lat: 40.7129, lng: -73.9984, type: 'parking' },
-  ];
+  ngOnInit() {
+    this.parkingService.getParkingLots().subscribe({
+      next: (lots) => {
+        console.log('Received parking lots:', lots.length);
+        const mappedLots = lots.map(lot => ({
+          id: lot.id,
+          name: lot.name,
+          distance: '0.5 mi', // Todo: Calculate actual distance based on user location
+          available: lot.availableSlots,
+          price: lot.pricePerHour,
+          lat: lot.latitude,
+          lng: lot.longitude,
+          type: 'parking' as const
+        }));
+        this.parkingGarages.set(mappedLots);
+      },
+      error: (err) => {
+        console.error('Error fetching parking lots:', err);
+      }
+    });
+  }
 
   setViewMode(mode: 'map' | 'list') {
     this.viewMode.set(mode);
+  }
+
+  navigateToBooking(lotId: string) {
+    this.router.navigate(['/user/booking', lotId]);
   }
 }

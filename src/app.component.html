@@ -1,12 +1,3 @@
 <main>
-  <h1>GraphQL Integration Test</h1>
-  <div *ngIf="items$ | async as items">
-    <ul>
-      <li *ngFor="let item of items">
-        {{ item.name }} ({{ item.createdAt }})
-      </li>
-    </ul>
-    <pre>{{ items | json }}</pre>
-  </div>
   <router-outlet></router-outlet>
 </main>

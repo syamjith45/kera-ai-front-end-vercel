@@ -11,19 +11,9 @@ import { Observable } from 'rxjs';
   imports: [RouterOutlet, CommonModule]
 })
 export class AppComponent implements OnInit {
-  items$: Observable<any> | undefined;
 
-  constructor(private graphqlService: GraphqlService) { }
+  constructor() { }
 
   ngOnInit() {
-    this.items$ = this.graphqlService.query(`
-      query getItems {
-        items {
-          id
-          name
-          createdAt
-        }
-      }
-    `);
   }
 }

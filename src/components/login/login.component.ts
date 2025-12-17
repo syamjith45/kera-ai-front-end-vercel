@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { ProfileService } from '../../services/profile.service';
 
 @Component({
   selector: 'app-login',
@@ -13,8 +14,9 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
+  private profileService = inject(ProfileService);
 
-  role = signal<'user' | 'operator'>('user');
+  role = signal<'user' | 'operator'>('user'); // Kept for UI toggle, but not for auth logic
   email = signal('');
   password = signal('');
 
@@ -30,15 +32,44 @@ export class LoginComponent {
 
     this.authService.signIn(email, password).subscribe({
       next: (data) => {
-        console.log('Login successful', data);
+        console.log('Login successful response:', data);
         if (data.session) {
+          console.log('Session found, setting token...');
           localStorage.setItem('auth_token', data.session.access_token);
         }
 
-        if (this.role() === 'user') {
-          this.router.navigate(['/user/home']);
-        } else {
-          this.router.navigate(['/operator/dashboard']);
+        // FETCH REAL ROLE FROM DB
+        if (data.user) {
+          console.log('User found in login response, fetching profile for:', data.user.id);
+          this.profileService.getProfile(data.user.id).subscribe({
+            next: (profile) => {
+              console.log('Fetched Profile Success:', profile);
+              const dbRole = profile.role || 'user'; // Fallback to user
+
+              // Store role in LocalStorage as per guide
+              localStorage.setItem('userRole', dbRole);
+
+              switch (dbRole) {
+                case 'superadmin':
+                  this.router.navigate(['/superadmin/dashboard']);
+                  break;
+                case 'admin':
+                  this.router.navigate(['/admin/dashboard']);
+                  break;
+                case 'operator':
+                  this.router.navigate(['/operator/dashboard']);
+                  break;
+                default:
+                  this.router.navigate(['/user/home']);
+                  break;
+              }
+            },
+            error: (err) => {
+              console.error('Failed to fetch profile', err);
+              // Fallback based on UI toggle if DB fails? Or just go to home?
+              this.router.navigate(['/user/home']);
+            }
+          });
         }
       },
       error: (err) => {

@@ -58,4 +58,10 @@ export class AuthService {
             map(response => response.data.user)
         );
     }
+
+    getSession(): Observable<any> {
+        return from(this.supabase.auth.getSession()).pipe(
+            map(response => response.data.session)
+        );
+    }
 }

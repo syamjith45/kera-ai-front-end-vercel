@@ -1,34 +1,67 @@
-
 <div class="p-4">
   <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">My Passes</h1>
 
   <div class="flex justify-center mb-6">
     <div class="bg-gray-200 p-1 rounded-full flex">
-      <button (click)="setView('active')" [class]="passView() === 'active' ? 'bg-white text-blue-600 shadow' : 'text-gray-600'" class="px-8 py-2 text-sm font-semibold rounded-full transition-all duration-300">
+      <button (click)="setView('active')"
+        [class]="passView() === 'active' ? 'bg-white text-blue-600 shadow' : 'text-gray-600'"
+        class="px-8 py-2 text-sm font-semibold rounded-full transition-all duration-300">
         Active
       </button>
-      <button (click)="setView('history')" [class]="passView() === 'history' ? 'bg-white text-blue-600 shadow' : 'text-gray-600'" class="px-8 py-2 text-sm font-semibold rounded-full transition-all duration-300">
+      <button (click)="setView('history')"
+        [class]="passView() === 'history' ? 'bg-white text-blue-600 shadow' : 'text-gray-600'"
+        class="px-8 py-2 text-sm font-semibold rounded-full transition-all duration-300">
         History
       </button>
     </div>
   </div>
 
   @if (passView() === 'active') {
-    <div class="bg-white p-6 rounded-2xl border-2 border-blue-500 shadow-lg">
-      <h2 class="text-xl font-bold text-center text-gray-800">Ticket Card</h2>
-      <p class="text-center text-gray-500 mb-4">Westside Structure - Spot 4B</p>
-      <div class="flex justify-center my-4">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=KeraAI-Parking-Spot4B" alt="QR Code for parking pass" />
-      </div>
-      <div class="text-center mb-4">
-        <p class="text-sm text-gray-500">Parked duration</p>
-        <p class="text-3xl font-bold text-gray-800 tracking-wider">01h 23m 45s</p>
-      </div>
-      <button class="w-full text-center text-blue-600 font-semibold py-2">View Instructions</button>
+  @if (activeBookings().length > 0) {
+  @for (booking of activeBookings(); track booking.id) {
+  <div class="bg-white p-6 rounded-2xl border-2 border-blue-500 shadow-lg mb-4">
+    <h2 class="text-xl font-bold text-center text-gray-800">Ticket Card</h2>
+    <p class="text-center text-gray-500 mb-4">{{ booking.parking_lots?.name || 'Loading location...' }}</p>
+    <div class="flex justify-center my-4">
+      <img
+        [src]="'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + (booking.qr_code_data || booking.id)"
+        alt="QR Code" />
     </div>
+    <div class="text-center mb-4">
+      <p class="text-sm text-gray-500">Status</p>
+      <p class="text-3xl font-bold text-gray-800 tracking-wider uppercase">{{ booking.status }}</p>
+    </div>
+    <button class="w-full text-center text-blue-600 font-semibold py-2">View Instructions</button>
+  </div>
+  }
   } @else {
+  <div class="text-center p-8">
+    <p class="text-gray-500">No active passes.</p>
+    <p class="text-sm text-gray-400 mt-2">Book a spot to get started!</p>
+  </div>
+  }
+  } @else {
+  <div class="space-y-3">
+    @if (historyBookings().length > 0) {
+    @for (booking of historyBookings(); track booking.id) {
+    <div class="bg-white p-4 rounded-xl border border-gray-200">
+      <div class="flex justify-between items-center">
+        <div>
+          <h3 class="font-semibold text-gray-800">{{ booking.parking_lots?.name || 'Location N/A' }}</h3>
+          <p class="text-sm text-gray-500">{{ booking.created_at | date:'mediumDate' }}</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-medium"
+          [class]="booking.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+          {{ booking.status }}
+        </span>
+      </div>
+    </div>
+    }
+    } @else {
     <div class="text-center p-8">
       <p class="text-gray-500">No past passes found.</p>
     </div>
+    }
+  </div>
   }
 </div>
