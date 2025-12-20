@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
 export interface Operator {
   id: string;
@@ -76,8 +77,7 @@ export class AdminService {
                  // (Backend 'allUsers' doesn't return it)
                  try {
                      const { createClient } = await import('@supabase/supabase-js');
-                     const { supabaseConfig } = await import('../supabase-config');
-                     const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+                     const supabase = createClient(environment.supabase.url, environment.supabase.anonKey);
                      
                      const { data: assignments } = await supabase
                         .from('operator_assignments')

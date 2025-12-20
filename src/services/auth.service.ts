@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { supabaseConfig } from '../supabase-config';
+import { environment } from '../environments/environment';
 import { from, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -11,7 +11,7 @@ export class AuthService {
     private supabase: SupabaseClient;
 
     constructor() {
-        this.supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+        this.supabase = createClient(environment.supabase.url, environment.supabase.anonKey);
     }
 
     signUp(email: string, password: string, data: any): Observable<any> {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Apollo, gql } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 
 export interface ParkingLot {
     id: string;
@@ -124,8 +125,7 @@ export class ParkingService {
             (async () => {
                 try {
                     const { createClient } = await import('@supabase/supabase-js');
-                    const { supabaseConfig } = await import('../supabase-config');
-                    const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+                    const supabase = createClient(environment.supabase.url, environment.supabase.anonKey);
 
                     const { data, error } = await supabase
                         .from('operator_assignments')
@@ -160,8 +160,7 @@ export class ParkingService {
         // but for now we'll instantiate it here or key off an existing pattern if safe.
         // Creating a temporary client for this operation:
         const { createClient } = await import('@supabase/supabase-js');
-        const { supabaseConfig } = await import('../supabase-config');
-        const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+        const supabase = createClient(environment.supabase.url, environment.supabase.anonKey);
 
         const updateData: any = {};
         if (data.pricePerHour !== undefined) updateData.hourly_rate = data.pricePerHour;
