@@ -11,7 +11,7 @@ export class PaymentService {
 
     processPayment(amount: number, bookingId: string): Observable<boolean> {
         // Mock payment processing
-        console.log(`Processing payment of $${amount} for booking ${bookingId}`);
+        console.log(`Processing payment of ₹${amount} for booking ${bookingId}`);
         return timer(2000).pipe(
             mapTo(true) // Always return success for now
         );

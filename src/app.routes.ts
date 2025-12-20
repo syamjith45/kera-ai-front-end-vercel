@@ -13,6 +13,8 @@ import { OperatorDashboardComponent } from './components/operator/dashboard/dash
 import { OperatorLiveViewComponent } from './components/operator/live-view/live-view.component';
 import { OperatorStatsComponent } from './components/operator/stats/stats.component';
 import { OperatorProfileComponent } from './components/operator/profile/profile.component';
+import { OperatorSpotBookingComponent } from './components/operator/spot-booking/spot-booking.component';
+import { OperatorScannerComponent } from './components/operator/scanner/scanner.component';
 import { UserBookingComponent } from './components/user/booking/booking.component';
 import { UserPaymentComponent } from './components/user/payment/payment.component';
 
@@ -50,6 +52,8 @@ export const APP_ROUTES: Routes = [
       { path: 'live-view', component: OperatorLiveViewComponent },
       { path: 'stats', component: OperatorStatsComponent },
       { path: 'profile', component: OperatorProfileComponent },
+      { path: 'spot-booking', component: OperatorSpotBookingComponent },
+      { path: 'scanner', component: OperatorScannerComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
@@ -68,7 +72,8 @@ export const APP_ROUTES: Routes = [
     canActivate: [RoleGuard],
     data: { roles: ['admin', 'superadmin'] },
     children: [
-      { path: 'dashboard', loadComponent: () => import('./components/admin/dashboard/dashboard.component').then(m => m.AdminDashboardComponent) }
+      { path: 'dashboard', loadComponent: () => import('./components/admin/dashboard/dashboard.component').then(m => m.AdminDashboardComponent) },
+      { path: 'operators', loadComponent: () => import('./components/admin/operator-management/operator-management.component').then(m => m.OperatorManagementComponent) }
     ]
   },
   {

@@ -64,7 +64,7 @@
             <p class="text-sm text-green-600 font-medium">Available: {{ garage.available }} spots</p>
           </div>
         </div>
-        <p class="text-lg font-bold text-gray-800 whitespace-nowrap">${{ garage.price }}/hr</p>
+        <p class="text-lg font-bold text-gray-800 whitespace-nowrap">₹{{ garage.price }}/hr</p>
       </div>
       <div class="flex gap-3">
         <button (click)="navigateToBooking(garage.id)"

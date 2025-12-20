@@ -57,7 +57,7 @@
           <p class="text-xs text-gray-500">{{ booking.created_at | date:'shortTime' }}</p>
         </div>
       </div>
-      <span class="font-semibold text-green-600">+${{ booking.total_cost }}</span>
+      <span class="font-semibold text-green-600">+₹{{ booking.total_cost }}</span>
     </div>
     } @empty {
     <p class="text-gray-500 text-center text-sm">No revenue recorded yet.</p>

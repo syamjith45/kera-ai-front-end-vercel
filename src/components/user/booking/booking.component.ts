@@ -61,7 +61,27 @@ export class UserBookingComponent implements OnInit {
 
     proceedToPayment() {
         this.authService.getUser().subscribe(user => {
-            if (user && this.lotId && this.totalCost() > 0) {
+            const currentLot = this.lot();
+            if (user && this.lotId && this.totalCost() > 0 && currentLot) {
+                
+                // Find first available slot (Handle both Array and Object formats for robustness)
+                let availableSlotId: string | undefined;
+                const slotsData = currentLot.slots as any;
+
+                if (Array.isArray(slotsData)) {
+                    // Standard GQL Array format: [{id, status}, ...]
+                    const s = slotsData.find((x: any) => x.status === 'available');
+                    availableSlotId = s ? s.id : undefined;
+                } else if (slotsData && typeof slotsData === 'object') {
+                    // Raw/Fallback Object format: {"A1": "available", ...}
+                    availableSlotId = Object.keys(slotsData).find(key => slotsData[key] === 'available');
+                }
+                
+                if (!availableSlotId) {
+                    alert('No slots available in this parking lot!');
+                    return;
+                }
+
                 // For now, create booking immediately (status pending) then go to 'payment' (mock)
                 this.bookingService.createBooking({
                     user_id: user.id,
@@ -69,11 +89,16 @@ export class UserBookingComponent implements OnInit {
                     start_time: new Date(this.startTime()).toISOString(),
                     end_time: new Date(this.endTime()).toISOString(),
                     status: 'pending',
-                    total_cost: this.totalCost()
-                }).subscribe(booking => {
-                    // Navigate to payment or passes (skipping payment screen for brevity if needed, but plan said Integrate Payment Screen)
-                    // Let's go to payment logic
-                    this.router.navigate(['/user/payment', booking.id]);
+                    total_cost: this.totalCost(),
+                    slot: availableSlotId // Pass the selected slot
+                }).subscribe({
+                    next: (booking) => {
+                         this.router.navigate(['/user/payment', booking.id]);
+                    },
+                    error: (err: any) => {
+                        console.error('Booking failed', err);
+                        alert('Failed to create booking: ' + (err.message || 'Unknown error'));
+                    }
                 });
             }
         });

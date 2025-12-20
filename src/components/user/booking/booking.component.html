@@ -14,7 +14,7 @@
         <h2 class="text-lg font-bold text-gray-800">{{ parkingLot.name }}</h2>
         <p class="text-gray-500 text-sm">{{ parkingLot.address }}</p>
         <div class="flex justify-between items-center mt-4">
-            <span class="text-blue-600 font-semibold">${{ parkingLot.pricePerHour }}/hr</span>
+            <span class="text-blue-600 font-semibold">₹{{ parkingLot.pricePerHour }}/hr</span>
             <span class="text-green-600 text-sm font-medium">{{ parkingLot.availableSlots }} spots left</span>
         </div>
     </div>
@@ -36,7 +36,7 @@
 
     <div class="bg-gray-50 p-4 rounded-xl flex justify-between items-center">
         <span class="font-semibold text-gray-600">Total Cost</span>
-        <span class="text-2xl font-bold text-blue-600">${{ totalCost() }}</span>
+        <span class="text-2xl font-bold text-blue-600">₹{{ totalCost() }}</span>
     </div>
 
     <button (click)="proceedToPayment()" [disabled]="totalCost() <= 0"

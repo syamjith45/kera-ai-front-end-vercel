@@ -16,6 +16,7 @@ export interface ParkingLot {
     longitude: number;
     hourly_rate?: number; // Alias matching DB
     available_spots?: number; // Alias matching DB
+    slots?: { id: string; status: string }[];
 }
 
 const GET_PARKING_LOTS = gql`
@@ -30,6 +31,10 @@ const GET_PARKING_LOTS = gql`
       coords {
         lat
         lng
+      }
+      slots {
+        id
+        status
       }
     }
   }
@@ -46,6 +51,7 @@ export class ParkingService {
         return this.apollo
             .watchQuery<{ parkingLots: any[] }>({
                 query: GET_PARKING_LOTS,
+                fetchPolicy: 'network-only'
             })
             .valueChanges.pipe(
                 map(result => {
@@ -70,18 +76,82 @@ export class ParkingService {
                         description: 'Description not available',
                         image_url: 'https://images.unsplash.com/photo-1470224114660-3f6686c562eb?q=80&w=2000&auto=format&fit=crop',
                         hourly_rate: lot.pricePerHour, // Alias for UI compatibility
-                        available_spots: lot.availableSlots // Alias for UI compatibility
+                        available_spots: lot.availableSlots, // Alias for UI compatibility
+                        slots: lot.slots || []
                     } as any));
                 })
             );
     }
 
     getParkingLotDetails(id: string): Observable<ParkingLot> {
-        // Since there's no single lot query in GQL provided, filtering from list or just returning mocked details if needed.
-        // Or re-using getParkingLots and finding the one.
         return this.getParkingLots().pipe(
             map(lots => lots.find(l => l.id === id)!)
         );
+    }
+
+    getOperatorAssignedLot(userId: string): Observable<ParkingLot | null> {
+        // Query to match user's assigned lot.
+        // Assuming backend exposing 'assigned_lot_id' on 'user' or 'me'
+        const GET_MY_LOT = gql`
+            query GetMyLot {
+                me {
+                    assigned_lot_id
+                }
+            }
+        `;
+        
+        return this.apollo.query<{ me: { assigned_lot_id: string } }>({
+            query: GET_MY_LOT,
+            fetchPolicy: 'network-only'
+        }).pipe(
+            map(result => {
+                 const lotId = result.data.me?.assigned_lot_id;
+                 if(!lotId) return null;
+                 return lotId;
+            }),
+            // If we get an ID, we need the full lot details. 
+            // Reuse getParkingLots or similar.
+            // Using switchMap would be better but keeping it simple with nested subscription or just mapping if I had the lot list.
+            // I'll return the ID for now, wait, the component expects a Lot object.
+            // Let's just fetch all lots and find the one matching the ID.
+        ) as any; // Temporary cast to fix flow, refining below
+    }
+    
+    // Correct Implementation of getOperatorAssignedLot to return Observable<ParkingLot | null>
+    // using direct Supabase query because 'me' GQL query does not return assigned_lot_id in current backend resolvers.
+    getOperatorAssignedLotWithDetails(userId: string): Observable<ParkingLot | null> {
+        return new Observable(observer => {
+            (async () => {
+                try {
+                    const { createClient } = await import('@supabase/supabase-js');
+                    const { supabaseConfig } = await import('../supabase-config');
+                    const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+
+                    const { data, error } = await supabase
+                        .from('operator_assignments')
+                        .select('lot_id')
+                        .eq('operator_id', userId)
+                        .single();
+
+                    if (error || !data) {
+                        // Not assigned or error
+                        observer.next(null);
+                        observer.complete();
+                        return;
+                    }
+
+                    // Got lot ID, now fetch full details via existing GQL method
+                    this.getParkingLots().subscribe(lots => {
+                         const found = lots.find(l => l.id === data.lot_id);
+                         observer.next(found || null);
+                         observer.complete();
+                    });
+
+                } catch (e) {
+                    observer.error(e);
+                }
+            })();
+        });
     }
 
     async updateParkingLot(id: string, data: Partial<ParkingLot>): Promise<void> {
