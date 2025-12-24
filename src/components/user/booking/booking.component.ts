@@ -1,10 +1,11 @@
-import { Component, ChangeDetectionStrategy, signal, OnInit, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ParkingService, ParkingLot } from '../../../services/parking.service';
 import { BookingService } from '../../../services/booking.service';
 import { AuthService } from '../../../services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-user-booking',
@@ -12,12 +13,14 @@ import { AuthService } from '../../../services/auth.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [CommonModule, FormsModule]
 })
-export class UserBookingComponent implements OnInit {
+export class UserBookingComponent implements OnInit, OnDestroy {
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private parkingService = inject(ParkingService);
     private bookingService = inject(BookingService);
     private authService = inject(AuthService);
+    
+    private bookingSubscription?: Subscription;
 
     lotId: string | null = null;
     lot = signal<ParkingLot | null>(null);
@@ -29,22 +32,48 @@ export class UserBookingComponent implements OnInit {
     // Cost calculation
     totalCost = signal<number>(0);
 
+    // State
+    isProcessing = signal(false);
+    errorMsg = signal<string | null>(null);
+
     ngOnInit() {
         this.lotId = this.route.snapshot.paramMap.get('lotId');
+        console.log('BookingComponent initialized with Lot ID:', this.lotId);
+        
         if (this.lotId) {
-            this.parkingService.getParkingLotDetails(this.lotId).subscribe(l => {
-                this.lot.set(l);
-                // Default times
-                const now = new Date();
-                const later = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour later
-                this.startTime.set(now.toISOString().slice(0, 16));
-                this.endTime.set(later.toISOString().slice(0, 16));
-                this.calculateCost();
+            this.parkingService.getParkingLotDetails(this.lotId).subscribe({
+                next: (l) => {
+                    if (l) {
+                        this.lot.set(l);
+                        // Default times
+                        const now = new Date();
+                        const later = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour later
+                        this.startTime.set(now.toISOString().slice(0, 16));
+                        this.endTime.set(later.toISOString().slice(0, 16));
+                        this.calculateCost();
+                    } else {
+                        console.error('Lot not found in ngOnInit');
+                        this.errorMsg.set('Parking lot details could not be loaded.');
+                    }
+                },
+                error: (err) => {
+                    console.error('Error in ngOnInit getParkingLotDetails:', err);
+                    this.errorMsg.set('Failed to load parking lot details.');
+                }
             });
         }
     }
 
+    ngOnDestroy() {
+        if (this.bookingSubscription) {
+            this.bookingSubscription.unsubscribe();
+        }
+    }
+
     calculateCost() {
+        // Clear previous errors when user modifies input
+        this.errorMsg.set(null);
+        
         const l = this.lot();
         if (!l || !this.startTime() || !this.endTime()) return;
 
@@ -60,46 +89,51 @@ export class UserBookingComponent implements OnInit {
     }
 
     proceedToPayment() {
+        // Clear error state
+        this.errorMsg.set(null);
+
+        console.log('proceedToPayment called. LotID:', this.lotId, 'Processing:', this.isProcessing());
+
+        if (!this.lotId) {
+             this.errorMsg.set('Invalid Parking Lot ID. Please return to home and try again.');
+             return;
+        }
+
+        if (this.isProcessing()) return;
+
+        this.isProcessing.set(true);
+
         this.authService.getUser().subscribe(user => {
-            const currentLot = this.lot();
-            if (user && this.lotId && this.totalCost() > 0 && currentLot) {
+            if (user && this.lotId && this.totalCost() > 0) {
                 
-                // Find first available slot (Handle both Array and Object formats for robustness)
-                let availableSlotId: string | undefined;
-                const slotsData = currentLot.slots as any;
-
-                if (Array.isArray(slotsData)) {
-                    // Standard GQL Array format: [{id, status}, ...]
-                    const s = slotsData.find((x: any) => x.status === 'available');
-                    availableSlotId = s ? s.id : undefined;
-                } else if (slotsData && typeof slotsData === 'object') {
-                    // Raw/Fallback Object format: {"A1": "available", ...}
-                    availableSlotId = Object.keys(slotsData).find(key => slotsData[key] === 'available');
-                }
+                // Create booking with auto-assignment (no slot passed)
+                console.log('Creating booking for user:', user.id, 'Lot:', this.lotId);
                 
-                if (!availableSlotId) {
-                    alert('No slots available in this parking lot!');
-                    return;
-                }
-
-                // For now, create booking immediately (status pending) then go to 'payment' (mock)
-                this.bookingService.createBooking({
+                this.bookingSubscription = this.bookingService.createBooking({
                     user_id: user.id,
                     lot_id: this.lotId,
                     start_time: new Date(this.startTime()).toISOString(),
                     end_time: new Date(this.endTime()).toISOString(),
                     status: 'pending',
                     total_cost: this.totalCost(),
-                    slot: availableSlotId // Pass the selected slot
+                        // slot: undefined // Let backend auto-assign
                 }).subscribe({
                     next: (booking) => {
-                         this.router.navigate(['/user/payment', booking.id]);
+                            console.log('Booking created successfully:', booking.id);
+                            this.router.navigate(['/user/payment', booking.id]);
                     },
                     error: (err: any) => {
-                        console.error('Booking failed', err);
-                        alert('Failed to create booking: ' + (err.message || 'Unknown error'));
+                        console.error('Booking failed:', err);
+                        // Handle specific backend errors
+                        const msg = err.message || 'Unknown error';
+                        this.errorMsg.set('Failed to create booking: ' + msg);
+                        this.isProcessing.set(false);
                     }
                 });
+            } else {
+                console.warn('Validation failed: User', !!user, 'LotID', this.lotId, 'Cost', this.totalCost());
+                this.errorMsg.set('Please sign in and ensure valid booking details (Cost > 0).');
+                this.isProcessing.set(false);
             }
         });
     }

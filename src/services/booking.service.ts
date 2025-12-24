@@ -41,7 +41,7 @@ const MY_BOOKINGS = gql`
 `;
 
 const CREATE_BOOKING = gql`
-  mutation CreateBooking($lotId: ID!, $slot: String!, $duration: Int!) {
+  mutation CreateBooking($lotId: ID!, $slot: String, $duration: Int!) {
     createBooking(lotId: $lotId, slot: $slot, duration: $duration) {
       id
       status
@@ -90,17 +90,13 @@ export class BookingService {
         // Use slot from input, or fallback if absolutely necessary (but cleaner to require it)
         const slot = booking.slot; 
 
-        if (!slot) {
-             console.error('No slot provided for booking!');
-             // We could throw here, but let's see if we can let it fail gracefully or just pass 'A1' as last resort debugging?
-             // No, let's fail if undefined to force UI to fix it.
-        }
+        // Removed strict slot check to allow backend auto-assignment
 
         return this.apollo.mutate<{ createBooking: any }>({
             mutation: CREATE_BOOKING,
             variables: {
                 lotId: booking.lot_id,
-                slot: slot,
+                slot: slot, // Can be undefined now
                 duration: duration
             }
         }).pipe(

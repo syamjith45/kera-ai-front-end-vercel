@@ -108,4 +108,33 @@ export class UserHomeComponent implements OnInit {
   navigateToBooking(lotId: string) {
     this.router.navigate(['/user/booking', lotId]);
   }
+
+  bookNearest() {
+    const garages = this.parkingGarages();
+    const currentLoc = this.userLocation();
+    
+    if (!currentLoc || garages.length === 0) {
+      alert('Unable to assume current location or no parking lots valid.');
+      return;
+    }
+
+    // Find nearest
+    // We can rely on the fact that we mapped them with distance, but distance is a string "X km".
+    // Better to recalculate numeric distance or parse it. Let's recalculate for safety.
+    
+    let nearest: any = null;
+    let minDist = Infinity;
+
+    for (const g of garages) {
+      const d = this.calculateDistance(currentLoc.lat, currentLoc.lng, g.lat, g.lng);
+      if (d < minDist) {
+        minDist = d;
+        nearest = g;
+      }
+    }
+
+    if (nearest) {
+      this.navigateToBooking(nearest.id);
+    }
+  }
 }
