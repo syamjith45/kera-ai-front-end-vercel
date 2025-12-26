@@ -120,13 +120,13 @@ export class OperatorManagementComponent implements OnInit {
     // Load Operators
     this.adminService.getOperators().subscribe({
       next: (ops) => this.operators.set(ops),
-      error: (e) => console.error('Error loading operators', e)
+      error: (e) => {}
     });
 
     // Load Parking Lots for dropdown
     this.parkingService.getParkingLots().subscribe({
       next: (lots) => this.parkingLots.set(lots),
-      error: (e) => console.error('Error loading lots', e)
+      error: (e) => {}
     });
   }
 
@@ -140,7 +140,7 @@ export class OperatorManagementComponent implements OnInit {
           this.loadData(); // Reload to refresh state
         },
         error: (err) => {
-          console.error(err);
+
           alert('Failed to assign operator.');
         }
       });
@@ -161,7 +161,7 @@ export class OperatorManagementComponent implements OnInit {
                   this.loadData();
               },
               error: (err) => {
-                  console.error(err);
+
                   alert('Failed to revoke assignment.');
               }
           });

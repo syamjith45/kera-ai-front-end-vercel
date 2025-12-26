@@ -46,7 +46,7 @@ export class UserHomeComponent implements OnInit {
         this.parkingGarages.set(mappedLots);
       },
       error: (err) => {
-        console.error('Error fetching parking lots:', err);
+
       }
     });
   }
@@ -63,12 +63,12 @@ export class UserHomeComponent implements OnInit {
           this.refreshDistances();
         },
         (error) => {
-          console.warn('Geolocation denied or failed', error);
+
           this.userLocation.set(null);
         }
       );
     } else {
-       console.warn('Geolocation not supported');
+
     }
   }
 

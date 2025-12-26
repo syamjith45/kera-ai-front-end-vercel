@@ -74,7 +74,7 @@ export class OperatorDashboardComponent implements OnInit {
               if(lot) this.newFee.set(lot.pricePerHour);
           },
           error: (err) => {
-              console.error('Failed to fetch assigned lot', err);
+
               this.managedLot.set(null); // Explicit No Data
           }
       });
@@ -90,14 +90,14 @@ export class OperatorDashboardComponent implements OnInit {
       this.fetchAssignedLot(this.managedLot().id); // Reload ?? No need id, just reload
       alert('Fee updated successfully!');
     } catch (e) {
-      console.error('Failed to update fee', e);
+
       alert('Failed to update fee: ' + (e as any).message); // Show backend error format
     }
   }
 
   // Mock actions
   triggerAction(action: string) {
-    console.log('Action triggered:', action);
+
     if (action === 'barrier') {
       alert('Boom Barrier Activated');
     } else {

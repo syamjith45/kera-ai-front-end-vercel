@@ -6,7 +6,7 @@ import { setContext } from '@apollo/client/link/context';
 import { AuthService } from './services/auth.service';
 import { firstValueFrom } from 'rxjs';
 
-const uri = 'http://localhost:4000/graphql';
+const uri = 'https://keraai-graphql-backend.vercel.app/graphql';
 
 export const graphqlProvider = provideApollo((): ApolloClientOptions => {
     const httpLink = inject(HttpLink);
@@ -14,11 +14,11 @@ export const graphqlProvider = provideApollo((): ApolloClientOptions => {
 
     const auth = setContext(async (_, { headers }) => {
         try {
-            console.log('GraphQL Auth Provider - Fetching Session...');
+
             const session = await firstValueFrom(authService.getSession());
             const token = session?.access_token;
-            console.log('GraphQL Auth Provider - Session:', session);
-            console.log('GraphQL Auth Provider - Token:', token);
+
+
             return {
                 headers: {
                     ...headers,
@@ -26,7 +26,7 @@ export const graphqlProvider = provideApollo((): ApolloClientOptions => {
                 }
             };
         } catch (e) {
-            console.error('Error getting auth session', e);
+
             return { headers };
         }
     });

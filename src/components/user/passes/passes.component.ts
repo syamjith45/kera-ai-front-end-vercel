@@ -25,14 +25,14 @@ export class UserPassesComponent implements OnInit {
     this.authService.getUser().subscribe(user => {
       if (user) {
         this.bookingService.getUserBookings(user.id).subscribe(bookings => {
-          console.log('Fetched Bookings:', bookings);
+
           const active = bookings.filter(b => b.status.toLowerCase() === 'active' || b.status.toLowerCase() === 'pending');
           const history = bookings.filter(b => b.status.toLowerCase() === 'completed' || b.status.toLowerCase() === 'cancelled');
-          console.log('Filtered Active:', active);
-          console.log('Filtered History:', history);
+
+
           this.activeBookings.set(active);
           this.historyBookings.set(history);
-        }, err => console.error('Error fetching bookings:', err));
+        });
       }
     });
   }

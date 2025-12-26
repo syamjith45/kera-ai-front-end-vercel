@@ -14,16 +14,16 @@ export class UserLayoutComponent implements OnInit {
   private profileService = inject(ProfileService);
 
   ngOnInit() {
-    console.log('UserLayout initialized, checking session...');
+
     this.authService.getUser().subscribe(user => {
       if (user) {
-        console.log('User session found in layout, fetching profile for:', user.id);
+
         this.profileService.getProfile(user.id).subscribe({
-          next: (profile) => console.log('Layout loaded profile:', profile),
-          error: (err) => console.error('Layout failed to load profile:', err)
+          next: (profile) => {},
+          error: (err) => {}
         });
       } else {
-        console.log('No user session in layout');
+
       }
     });
   }

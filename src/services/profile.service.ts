@@ -44,7 +44,7 @@ export class ProfileService {
     constructor(private apollo: Apollo) { }
 
     getProfile(userId: string): Observable<UserProfile> {
-        console.log('ProfileService.getProfile called for:', userId);
+
         return this.apollo
             .watchQuery<{ me: any }>({
                 query: GET_ME,
@@ -52,10 +52,10 @@ export class ProfileService {
             })
             .valueChanges.pipe(
                 map(result => {
-                    console.log('ProfileService.getProfile raw result:', result);
+
 
                     if (result.loading && !result.data) {
-                        console.log('ProfileService.getProfile: Loading...');
+
                         // Return a placeholder or standard object, or filter this out upstream if possible. 
                         // For now, returning a basic object with ID so the UI doesn't crash.
                         return { id: userId };
@@ -64,10 +64,10 @@ export class ProfileService {
                     const me = result.data?.me;
 
                     if (!me) {
-                        console.warn('ProfileService.getProfile: "me" is null (or data missing)');
+
                         return { id: userId };
                     }
-                    console.log('ProfileService.getProfile mapped user:', me);
+
                     return {
                         id: me.uid,
                         email: me.email,

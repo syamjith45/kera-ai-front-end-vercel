@@ -25,25 +25,25 @@ export class LoginComponent {
   }
 
   onLogin(): void {
-    console.log('Sending login request...');
+
 
     const email = this.email().trim();
     const password = this.password().trim();
 
     this.authService.signIn(email, password).subscribe({
       next: (data) => {
-        console.log('Login successful response:', data);
+
         if (data.session) {
-          console.log('Session found, setting token...');
+
           localStorage.setItem('auth_token', data.session.access_token);
         }
 
         // FETCH REAL ROLE FROM DB
         if (data.user) {
-          console.log('User found in login response, fetching profile for:', data.user.id);
+
           this.profileService.getProfile(data.user.id).subscribe({
             next: (profile) => {
-              console.log('Fetched Profile Success:', profile);
+
               const dbRole = profile.role || 'user'; // Fallback to user
 
               // Store role in LocalStorage as per guide
@@ -65,7 +65,7 @@ export class LoginComponent {
               }
             },
             error: (err) => {
-              console.error('Failed to fetch profile', err);
+
               // Fallback based on UI toggle if DB fails? Or just go to home?
               this.router.navigate(['/user/home']);
             }
@@ -73,7 +73,7 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        console.error('Login failed', err);
+
         alert('Login failed: ' + err.message);
       }
     });

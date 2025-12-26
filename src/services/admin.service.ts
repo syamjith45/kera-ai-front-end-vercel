@@ -97,7 +97,7 @@ export class AdminService {
                      observer.complete();
 
                  } catch (e) {
-                     console.error('Error fetching assignments', e);
+
                      // Return operators without assignment info on error
                      observer.next(operators.map(u => ({
                          id: u.uid,

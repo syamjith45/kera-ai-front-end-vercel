@@ -38,7 +38,7 @@ export class UserBookingComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.lotId = this.route.snapshot.paramMap.get('lotId');
-        console.log('BookingComponent initialized with Lot ID:', this.lotId);
+
         
         if (this.lotId) {
             this.parkingService.getParkingLotDetails(this.lotId).subscribe({
@@ -52,12 +52,12 @@ export class UserBookingComponent implements OnInit, OnDestroy {
                         this.endTime.set(later.toISOString().slice(0, 16));
                         this.calculateCost();
                     } else {
-                        console.error('Lot not found in ngOnInit');
+
                         this.errorMsg.set('Parking lot details could not be loaded.');
                     }
                 },
                 error: (err) => {
-                    console.error('Error in ngOnInit getParkingLotDetails:', err);
+
                     this.errorMsg.set('Failed to load parking lot details.');
                 }
             });
@@ -92,7 +92,7 @@ export class UserBookingComponent implements OnInit, OnDestroy {
         // Clear error state
         this.errorMsg.set(null);
 
-        console.log('proceedToPayment called. LotID:', this.lotId, 'Processing:', this.isProcessing());
+
 
         if (!this.lotId) {
              this.errorMsg.set('Invalid Parking Lot ID. Please return to home and try again.');
@@ -107,7 +107,7 @@ export class UserBookingComponent implements OnInit, OnDestroy {
             if (user && this.lotId && this.totalCost() > 0) {
                 
                 // Create booking with auto-assignment (no slot passed)
-                console.log('Creating booking for user:', user.id, 'Lot:', this.lotId);
+
                 
                 this.bookingSubscription = this.bookingService.createBooking({
                     user_id: user.id,
@@ -119,11 +119,11 @@ export class UserBookingComponent implements OnInit, OnDestroy {
                         // slot: undefined // Let backend auto-assign
                 }).subscribe({
                     next: (booking) => {
-                            console.log('Booking created successfully:', booking.id);
+
                             this.router.navigate(['/user/payment', booking.id]);
                     },
                     error: (err: any) => {
-                        console.error('Booking failed:', err);
+
                         // Handle specific backend errors
                         const msg = err.message || 'Unknown error';
                         this.errorMsg.set('Failed to create booking: ' + msg);
@@ -131,7 +131,7 @@ export class UserBookingComponent implements OnInit, OnDestroy {
                     }
                 });
             } else {
-                console.warn('Validation failed: User', !!user, 'LotID', this.lotId, 'Cost', this.totalCost());
+
                 this.errorMsg.set('Please sign in and ensure valid booking details (Cost > 0).');
                 this.isProcessing.set(false);
             }

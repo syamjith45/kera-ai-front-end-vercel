@@ -40,16 +40,16 @@ export class SignupComponent {
     const email = this.email().trim();
     const password = this.password().trim();
 
-    console.log('Sending signup request...', { email, metadata });
+
 
     this.authService.signUp(email, password, metadata).subscribe({
       next: (data) => {
-        console.log('Signup successful', data);
+
         alert('Account created successfully! You can now log in.');
         this.router.navigate(['/auth/login']);
       },
       error: (err) => {
-        console.error('Signup failed', err);
+
         alert('Signup failed: ' + err.message);
       }
     });

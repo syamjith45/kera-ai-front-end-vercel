@@ -47,15 +47,15 @@ export class UserProfileComponent implements OnInit {
   saveProfile() {
     const currentProfile = this.profile();
     if (currentProfile) {
-      console.log('Saving profile...', this.editForm);
+
       this.profileService.updateProfile(currentProfile.id, this.editForm).subscribe({
         next: (updated) => {
-          console.log('Profile updated successfully', updated);
+
           this.profile.set(updated);
           this.isEditing.set(false);
         },
         error: (err) => {
-          console.error('Error updating profile in component:', err);
+
         }
       });
     }

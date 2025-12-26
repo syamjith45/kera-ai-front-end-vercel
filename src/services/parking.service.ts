@@ -58,10 +58,10 @@ export class ParkingService {
                 map(result => {
                     const res = result as any;
                     if (res.errors) {
-                        console.error('GraphQL Errors in getParkingLots:', res.errors);
+
                     }
                     if (!result.data || !result.data.parkingLots) {
-                        console.warn('No parking lots found in response data');
+
                         return [];
                     }
                     return result.data.parkingLots.map(lot => ({

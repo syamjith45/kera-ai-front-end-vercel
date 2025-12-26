@@ -16,7 +16,7 @@ export const RoleGuard: CanActivateFn = (route, state) => {
 
     if (expectedRoles && !expectedRoles.includes(userRole)) {
         // Role not authorized
-        console.warn(`Access denied. User role '${userRole}' not in [${expectedRoles}]`);
+
         router.navigate(['/user/home']); // Or an access-denied page
         return false;
     }

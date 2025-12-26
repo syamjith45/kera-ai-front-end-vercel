@@ -50,7 +50,7 @@ export class OperatorProfileComponent implements OnInit {
         alert('Profile updated');
       },
       error: (err) => {
-        console.error('Profile update failed', err);
+
         alert('Failed to update profile');
       }
     });
