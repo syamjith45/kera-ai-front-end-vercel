@@ -83,6 +83,21 @@
         placeholder="Enter phone">
     </div>
 
+    <!-- Vehicle Details -->
+    <div>
+        <label class="block text-sm font-medium text-gray-700">Vehicle Number (Optional)</label>
+        <div class="mt-1 flex rounded-md shadow-sm">
+          <input 
+            type="text" 
+            [ngModel]="vehicleNumber()" 
+            (ngModelChange)="vehicleNumber.set($event)"
+            name="vehicleNumber" 
+            class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-md sm:text-sm border-gray-300 border p-2 uppercase" 
+            placeholder="KL-01-AB-1234">
+        </div>
+        <p class="mt-1 text-xs text-gray-500">Enter vehicle plate number for record.</p>
+    </div>
+
     <!-- Submit Button -->
     <button 
       type="submit" 

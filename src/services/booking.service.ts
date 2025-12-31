@@ -50,12 +50,13 @@ const CREATE_BOOKING = gql`
 `;
 
 const CREATE_OPERATOR_BOOKING = gql`
-  mutation CreateOperatorBooking($lotId: ID!, $slot: String, $duration: Int!, $walkInName: String!, $walkInPhone: String) {
-    createOperatorBooking(lotId: $lotId, slot: $slot, duration: $duration, walkInName: $walkInName, walkInPhone: $walkInPhone) {
+  mutation CreateOperatorBooking($lotId: ID!, $slot: String, $duration: Int!, $walkInName: String!, $walkInPhone: String, $vehicleNumber: String) {
+    createOperatorBooking(lotId: $lotId, slot: $slot, duration: $duration, walkInName: $walkInName, walkInPhone: $walkInPhone, vehicleNumber: $vehicleNumber) {
       id
       status
       bookingType
       walkInName
+      vehicleNumber
     }
   }
 `;
@@ -68,6 +69,7 @@ const VERIFY_BOOKING = gql`
       slotNumber
       walkInName
       userId
+      vehicleNumber
     }
   }
 `;
@@ -89,6 +91,9 @@ export class BookingService {
         const duration = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60));
         // Use slot from input, or fallback if absolutely necessary (but cleaner to require it)
         const slot = booking.slot; 
+        
+        // Also support vehicle number for self-booking if needed (based on schema changes description)
+        const vehicleNumber = booking.vehicleNumber;
 
         // Removed strict slot check to allow backend auto-assignment
 
@@ -97,7 +102,8 @@ export class BookingService {
             variables: {
                 lotId: booking.lot_id,
                 slot: slot, // Can be undefined now
-                duration: duration
+                duration: duration,
+                vehicleNumber: vehicleNumber
             }
         }).pipe(
             map(result => {
@@ -119,7 +125,8 @@ export class BookingService {
                 slot: booking.slot,
                 duration: booking.duration,
                 walkInName: booking.walkInName,
-                walkInPhone: booking.walkInPhone
+                walkInPhone: booking.walkInPhone,
+                vehicleNumber: booking.vehicleNumber
             }
         }).pipe(
             map(result => {

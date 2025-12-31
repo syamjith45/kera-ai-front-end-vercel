@@ -173,6 +173,21 @@ export class ParkingService {
             .update(updateData)
             .eq('id', id);
 
-        if (error) throw error;
+       if (error) throw error;
+    }
+
+    addParkingLot(data: { name: string; address: string; totalSlots: number; pricePerHour: number; lat: number; lng: number; slotPrefix: string }): Observable<any> {
+        const ADD_PARKING_LOT = gql`
+            mutation AddParkingLot($name: String!, $address: String!, $totalSlots: Int!, $pricePerHour: Float!, $lat: Float!, $lng: Float!, $slotPrefix: String!) {
+                addParkingLot(name: $name, address: $address, totalSlots: $totalSlots, pricePerHour: $pricePerHour, lat: $lat, lng: $lng, slotPrefix: $slotPrefix) {
+                    id
+                    name
+                }
+            }
+        `;
+        return this.apollo.mutate({
+            mutation: ADD_PARKING_LOT,
+            variables: data
+        });
     }
 }

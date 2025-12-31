@@ -17,6 +17,7 @@ import { OperatorSpotBookingComponent } from './components/operator/spot-booking
 import { OperatorScannerComponent } from './components/operator/scanner/scanner.component';
 import { UserBookingComponent } from './components/user/booking/booking.component';
 import { UserPaymentComponent } from './components/user/payment/payment.component';
+import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 
 export const APP_ROUTES: Routes = [
   {
@@ -66,13 +67,15 @@ export const APP_ROUTES: Routes = [
       { path: 'dashboard', loadComponent: () => import('./components/superadmin/dashboard/dashboard.component').then(m => m.SuperAdminDashboardComponent) }
     ]
   },
+
   {
     path: 'admin',
-    component: OperatorLayoutComponent, // Reusing Layout for now
+    component: AdminLayoutComponent, 
     canActivate: [RoleGuard],
     data: { roles: ['admin', 'superadmin'] },
     children: [
       { path: 'dashboard', loadComponent: () => import('./components/admin/dashboard/dashboard.component').then(m => m.AdminDashboardComponent) },
+      { path: 'add-parking-lot', loadComponent: () => import('./components/admin/add-parking-lot/add-parking-lot.component').then(m => m.AddParkingLotComponent) },
       { path: 'operators', loadComponent: () => import('./components/admin/operator-management/operator-management.component').then(m => m.OperatorManagementComponent) }
     ]
   },

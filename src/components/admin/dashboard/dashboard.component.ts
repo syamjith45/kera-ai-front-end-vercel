@@ -17,6 +17,7 @@ import { RouterModule } from '@angular/router';
             
             <!-- Conditional UI: Both Admin and Superadmin can see -->
             <button *ngIf="['admin', 'superadmin'].includes(userRole || '')" 
+                    routerLink="/admin/add-parking-lot"
                     class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                 Add New Lot
             </button>

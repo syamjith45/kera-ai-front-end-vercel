@@ -29,6 +29,7 @@ export class OperatorSpotBookingComponent implements OnInit {
   duration = signal<number>(1);
   walkInName = signal<string>('');
   walkInPhone = signal<string>('');
+  vehicleNumber = signal<string>('');
   
   // Computed/State
   totalCost = signal<number>(0);
@@ -109,7 +110,8 @@ export class OperatorSpotBookingComponent implements OnInit {
       slot: this.selectedSlotId(),
       duration: this.duration(),
       walkInName: this.walkInName(),
-      walkInPhone: this.walkInPhone()
+      walkInPhone: this.walkInPhone(),
+      vehicleNumber: this.vehicleNumber()
     }).subscribe({
       next: (booking) => {
         this.isLoading.set(false);
@@ -118,6 +120,7 @@ export class OperatorSpotBookingComponent implements OnInit {
         // Reset form or navigate
         this.walkInName.set('');
         this.walkInPhone.set('');
+        this.vehicleNumber.set('');
         this.loadParkingLots(); // Refresh slots
       },
       error: (err) => {
