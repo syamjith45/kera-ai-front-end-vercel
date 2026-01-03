@@ -6,7 +6,7 @@ import { setContext } from '@apollo/client/link/context';
 import { AuthService } from './services/auth.service';
 import { firstValueFrom } from 'rxjs';
 
-const uri = 'http://localhost:4000/graphql';
+const uri = 'https://kera-ai-backend.vercel.app/graphql';
 
 export const graphqlProvider = provideApollo((): ApolloClientOptions => {
     const httpLink = inject(HttpLink);
