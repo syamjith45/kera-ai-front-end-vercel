@@ -26,7 +26,7 @@ export class UserPassesComponent implements OnInit {
       if (user) {
         this.bookingService.getUserBookings(user.id).subscribe(bookings => {
 
-          const active = bookings.filter(b => b.status.toLowerCase() === 'active' || b.status.toLowerCase() === 'pending');
+          const active = bookings.filter(b => b.status.toLowerCase() === 'active' || b.status.toLowerCase() === 'pending' || b.status.toLowerCase() === 'succeeded');
           const history = bookings.filter(b => b.status.toLowerCase() === 'completed' || b.status.toLowerCase() === 'cancelled');
 
 
