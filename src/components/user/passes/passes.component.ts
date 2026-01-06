@@ -25,11 +25,23 @@ export class UserPassesComponent implements OnInit {
     this.authService.getUser().subscribe(user => {
       if (user) {
         this.bookingService.getUserBookings(user.id).subscribe(bookings => {
-
-          const active = bookings.filter(b => b.status.toLowerCase() === 'active' || b.status.toLowerCase() === 'pending' || b.status.toLowerCase() === 'succeeded');
-          const history = bookings.filter(b => b.status.toLowerCase() === 'completed' || b.status.toLowerCase() === 'cancelled');
-
-
+          console.log('All bookings:', bookings); // Debug log
+          
+          // Normalize status to lowercase for comparison
+          const active = bookings.filter(b => {
+            const status = b.status.toLowerCase();
+            return status === 'active' || 
+                   status === 'pending' || 
+                   status === 'succeeded' || 
+                   status === 'confirmed';
+          });
+          
+          const history = bookings.filter(b => {
+            const status = b.status.toLowerCase();
+            return status === 'completed' || 
+                   status === 'cancelled' ||
+                   status === 'expired';
+          });
           this.activeBookings.set(active);
           this.historyBookings.set(history);
         });
