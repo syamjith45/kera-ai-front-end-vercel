@@ -17,51 +17,76 @@
   </div>
 
   @if (passView() === 'active') {
-  @if (activeBookings().length > 0) {
-  @for (booking of activeBookings(); track booking.id) {
-  <div class="bg-white p-6 rounded-2xl border-2 border-blue-500 shadow-lg mb-4">
-    <h2 class="text-xl font-bold text-center text-gray-800">Ticket Card</h2>
-    <p class="text-center text-gray-500 mb-4">{{ booking.parking_lots?.name || 'Loading location...' }}</p>
-    <div class="flex justify-center my-4">
-      <img
-        [src]="'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + (booking.qr_code_data || booking.id)"
-        alt="QR Code" />
-    </div>
-    <div class="text-center mb-4">
-      <p class="text-sm text-gray-500">Status</p>
-      <p class="text-3xl font-bold text-gray-800 tracking-wider uppercase">{{ booking.status }}</p>
-    </div>
-    <button class="w-full text-center text-blue-600 font-semibold py-2">View Instructions</button>
-  </div>
-  }
-  } @else {
-  <div class="text-center p-8">
-    <p class="text-gray-500">No active passes.</p>
-    <p class="text-sm text-gray-400 mt-2">Book a spot to get started!</p>
-  </div>
-  }
-  } @else {
-  <div class="space-y-3">
-    @if (historyBookings().length > 0) {
-    @for (booking of historyBookings(); track booking.id) {
-    <div class="bg-white p-4 rounded-xl border border-gray-200">
-      <div class="flex justify-between items-center">
-        <div>
-          <h3 class="font-semibold text-gray-800">{{ booking.parking_lots?.name || 'Location N/A' }}</h3>
-          <p class="text-sm text-gray-500">{{ booking.created_at | date:'mediumDate' }}</p>
+    @if (activeBookings().length > 0) {
+      @for (booking of activeBookings(); track booking.id) {
+        <div class="bg-white p-6 rounded-2xl border-2 border-blue-500 shadow-lg mb-4">
+          <h2 class="text-xl font-bold text-center text-gray-800">Ticket Card</h2>
+          <p class="text-center text-gray-500 mb-4">{{ booking.parkingLotInfo?.name || 'Loading location...' }}</p>
+          <p class="text-center text-sm text-gray-400 mb-2">{{ booking.parkingLotInfo?.address }}</p>
+          
+          <div class="flex justify-center my-4">
+            <img
+              [src]="'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + booking.id"
+              alt="QR Code" 
+              class="w-40 h-40" />
+          </div>
+          
+          <div class="text-center mb-4">
+            <p class="text-sm text-gray-500">Status</p>
+            <p class="text-3xl font-bold text-gray-800 tracking-wider uppercase">{{ booking.status }}</p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+            <div>
+              <p class="text-gray-500">Slot Number</p>
+              <p class="font-semibold">{{ booking.slotNumber }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500">Amount</p>
+              <p class="font-semibold">₹{{ booking.totalAmount }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500">Start Time</p>
+              <p class="font-semibold">{{ booking.startTime | date:'short' }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500">Duration</p>
+              <p class="font-semibold">{{ booking.durationHours }}h</p>
+            </div>
+          </div>
+          
+          <button class="w-full text-center text-blue-600 font-semibold py-2">View Instructions</button>
         </div>
-        <span class="px-3 py-1 rounded-full text-xs font-medium"
-          [class]="booking.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
-          {{ booking.status }}
-        </span>
-      </div>
-    </div>
-    }
+      }
     } @else {
-    <div class="text-center p-8">
-      <p class="text-gray-500">No past passes found.</p>
-    </div>
+      <div class="text-center p-8">
+        <p class="text-gray-500">No active passes.</p>
+        <p class="text-sm text-gray-400 mt-2">Book a spot to get started!</p>
+      </div>
     }
-  </div>
+  } @else {
+    <div class="space-y-3">
+      @if (historyBookings().length > 0) {
+        @for (booking of historyBookings(); track booking.id) {
+          <div class="bg-white p-4 rounded-xl border border-gray-200">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="font-semibold text-gray-800">{{ booking.parkingLotInfo?.name || 'Location N/A' }}</h3>
+                <p class="text-sm text-gray-500">{{ booking.startTime | date:'mediumDate' }}</p>
+                <p class="text-xs text-gray-400">Amount: ₹{{ booking.totalAmount }}</p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-medium"
+                [class]="booking.status.toLowerCase() === 'completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                {{ booking.status }}
+              </span>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="text-center p-8">
+          <p class="text-gray-500">No past passes found.</p>
+        </div>
+      }
+    </div>
   }
 </div>
