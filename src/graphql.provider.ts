@@ -6,7 +6,7 @@ import { setContext } from '@apollo/client/link/context';
 import { AuthService } from './services/auth.service';
 import { firstValueFrom } from 'rxjs';
 
-const uri = 'https://kerai-graphql-backend.vercel.app/graphql';
+const uri = 'https://keraai-graphql-backend.vercel.app/graphql';
 
 export const graphqlProvider = provideApollo((): ApolloClientOptions => {
     const httpLink = inject(HttpLink);
